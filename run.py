@@ -3,6 +3,7 @@ import requests
 import shutil
 from PIL import Image
 
+
 extension_name = str(input("Extension name: "))
 sidebar_name = str(input("Sidebar name: "))
 functions_description = str(input("Describe the functionalities: "))
