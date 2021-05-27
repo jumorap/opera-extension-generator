@@ -4,6 +4,12 @@ import shutil
 from PIL import Image
 
 
+print("\n ___       ____  _    _____           __    ____  _"
+      "\n/ / \     | |_  \ \_/  | |   __      / /`_ | |_  | |\ |  __"
+      "\n\_\_/     |_|__ /_/ \  |_|  (_()     \_\_/ |_|__ |_| \| (_()")
+
+print("By: Jumorap\n")
+
 extension_name = str(input("Extension name: "))
 sidebar_name = str(input("Sidebar name: "))
 functions_description = str(input("Describe the functionalities: "))
@@ -40,6 +46,8 @@ messages_to_json = {
 # Updating the value version in manifest.json. The default value is 1.0
 # And Updating eh message value to Opera addons
 def updating_json_files(ext_ver, mess_json):
+    print("\n...Generating resources\n")
+
     if ext_ver == "":
         ext_ver = 1.0
 
@@ -55,20 +63,43 @@ def updating_json_files(ext_ver, mess_json):
 
 # Is downloaded the user image and saved as 'logo.png' in 'upload_this/logos'
 def download_load_image(url, name):
-    r = requests.get(url, stream=True)
+    print("...Getting logo\n")
+    try:
+        r = requests.get(url, stream=True)
 
-    with open(name, 'wb') as f:
-        r.raw.decode_content = True
-        shutil.copyfileobj(r.raw, f)
+        with open(name, 'wb') as f:
+            r.raw.decode_content = True
+            shutil.copyfileobj(r.raw, f)
+
+        return False
+
+    except:
+        print("ERROR: Not possible to get the logo. Try again with another URL logo in format .png")
+
+        return True
 
 
 # Is resized by default sizes the image uploaded by user
-def resize_logos(logo_route, sizes):
-    for size in sizes:
-        resizing = Image.open(logo_route).resize((size, size))
-        resizing.save(f'upload_this/logos/logo{size}x{size}.png')
+def resize_logos(logo_route, sizes, error):
+    if not error:
+        print("...Resizing logo\n")
+
+        for size in sizes:
+            resizing = Image.open(logo_route).resize((size, size))
+            resizing.save(f'upload_this/logos/logo{size}x{size}.png')
+
+        return True
+
+    return False
 
 
 updating_json_files(extension_version, messages_to_json)
-download_load_image(url_logo, image_result)
-resize_logos(image_result, default_sizes)
+get_error = download_load_image(url_logo, image_result)
+no_error = resize_logos(image_result, default_sizes, get_error)
+
+print("Complete."
+      "\nNow, go to opera://extensions in your Opera browser, "
+      "\nTurn on the developer mode option "
+      "\nClick in Load unpacked"
+      "\nGo to the file '/opera-extension-generator' and select the folder '/upload_this'"
+      "\nEnjoy of your Opera sidebar extension") if no_error else print("State: ERROR")
